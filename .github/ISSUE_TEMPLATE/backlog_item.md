@@ -1,12 +1,12 @@
 ---
 name: Backlog Item
-about: 
+about: New backlog item
 title: "PBI-"
 ---
-##PBI ID
+## PBI ID
 
-##PBI Defined
+## PBI Defined
 
-##Story Points
+## Story Points
 
-##Acceptance Criteria
+## Acceptance Criteria
