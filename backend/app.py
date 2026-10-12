@@ -5,13 +5,11 @@ from flask import Flask, request, session
 from flask_sqlalchemy import SQLAlchemy
 import requests
 
-cred = credentials.RefreshToken('path/to/refreshToken.json')
+cred = credentials.Certificate('serviceAccountKey.json')
 default_app = firebase_admin.initialize_app(cred)
 
 
 app = Flask(__name__)
-
-db = SQLAlchemy(app)
 
 app.secret_key = 'your-secret-key'
 
@@ -32,7 +30,7 @@ def register():
 def login():
     data = request.get_json()
 
-    firebase_auth_url = (f"https://googleapis.com{FIREBASE_API_KEY}")
+    firebase_auth_url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}"
     payload = {"email": data['email'], "password": data['password'], "returnSecureToken": True}
 
     try:
@@ -42,6 +40,8 @@ def login():
         if response.status_code == 200:
             session["user_id"] = response_data["localId"]
             return {'message': 'Login successful'}, 200
+        else:
+            return {'error': 'Login failed'}, 401
 
     except:
         return {'error': 'Invalid credentials'}, 401
