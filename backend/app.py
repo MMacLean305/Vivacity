@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from models import Exercise, Food, User
 
 app = Flask(__name__)
 
