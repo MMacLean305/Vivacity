@@ -3,6 +3,7 @@ import firebase_admin
 from firebase_admin import auth, credentials
 from flask import Flask, request, session
 from flask_sqlalchemy import SQLAlchemy
+from models import Exercise, Food, User
 import requests
 
 cred = credentials.Certificate('serviceAccountKey.json')
