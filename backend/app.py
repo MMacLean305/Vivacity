@@ -36,7 +36,7 @@ def register():
         user = User(firebase_uid = firebase_user.uid, username = data['username'], email=data['email'], role = 'member')
         db.session.add(user)
         db.session.commit()
-        return {'uid': user.uid}, 201
+        return {'uid': firebase_user.uid}, 201
     except Exception as e:
         db.session.rollback()
         print('Registration Error: ', e)
