@@ -5,16 +5,20 @@ from flask import Flask, request, session
 from flask_sqlalchemy import SQLAlchemy
 from models import Exercise, Food, User
 import requests
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 cred = credentials.Certificate('serviceAccountKey.json')
 default_app = firebase_admin.initialize_app(cred)
 
 
 app = Flask(__name__)
+app.secret_key = os.getenv('FLASK_SECRET_KEY')
 
-app.secret_key = 'your-secret-key'
-
-FIREBASE_API_KEY = ""
+FIREBASE_API_KEY = os.getenv('FIREBASE_API_KEY')
 
 @app.route('/register', methods=['POST'])
 def register():
