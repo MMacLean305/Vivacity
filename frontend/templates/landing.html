@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"   content="width=device-width, initial-scale=1.0">
+    <title>Vivacity | Workout and Nutrition Tracking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="nav">
+        <span class="logo">Vivacity</span>
+        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+    </header>
+    <section class="hero">
+        <h1>Live with Vitalty. Live with Vivacity</h1>
+        <p>Track your lifts, log your meals, and let AI build your next workout.</p>
+        <a class="cta" href="{{ url_for('login') }}">Get started</a>
+    </section>
+    <section class="features">
+        <div class="feature">
+            <i class="bx bx-restaurant"></i>
+            <h3>Nutrition Tracking</h3>
+            <p>Track your nutrition</p>
+        </div>
+        <div class="feature">
+            <i class="bx bx-calendar"></i>
+            <h3>Gym Session Tracking</h3>
+            <p>See which days you trained</p>
+        </div>
+        <div class="feature">
+            <i class="bx bx-dumbbell"></i>
+            <h3>Lift Tracking</h3>
+            <p>Record your lifts</p>
+        </div>
+        <div class="feature">
+            <i class="bx bx-bot"></i>
+            <h3>AI Workout Builder</h3>
+            <p>Get your next exercise recommended based on your previous session</p>
+        </div>
+    </section>
+
+</body>
+</html>

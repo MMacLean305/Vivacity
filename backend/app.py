@@ -15,7 +15,11 @@ cred = credentials.Certificate('serviceAccountKey.json')
 default_app = firebase_admin.initialize_app(cred)
 
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder = "../frontend/templates",
+    static_folder = "../frontend/static",
+    )
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vivacity.db'
