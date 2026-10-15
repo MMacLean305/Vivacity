@@ -2,7 +2,7 @@ import firebase_admin
 
 from firebase_admin import auth, credentials
 from flask import Flask, request, session
-from flask_sqlalchemy import SQLAlchemy
+from database import db
 from models import Exercise, Food, User
 import requests
 import os
@@ -15,8 +15,18 @@ cred = credentials.Certificate('serviceAccountKey.json')
 default_app = firebase_admin.initialize_app(cred)
 
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder = "../frontend/templates",
+    static_folder = "../frontend/static",
+    )
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vivacity.db'
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
 
 FIREBASE_API_KEY = os.getenv('FIREBASE_API_KEY')
 
@@ -26,10 +36,15 @@ def register():
     data = request.get_json()
 
     try:
-        user = auth.create_user(email=data['email'], password=data['password'])
-        return {'uid': user.uid}, 201
-    except:
-        return {'error': 'User already exists'}, 400
+        firebase_user = auth.create_user(email=data['email'], password=data['password'])
+        user = User(firebase_uid = firebase_user.uid, username = data['username'], email=data['email'], role = 'member')
+        db.session.add(user)
+        db.session.commit()
+        return {'uid': firebase_user.uid}, 201
+    except Exception as e:
+        db.session.rollback()
+        print('Registration Error: ', e)
+        return{'error' : 'Registration failed'}, 400
 
 @app.route('/login', methods=['POST'])
 def login():
