@@ -1,7 +1,7 @@
 import firebase_admin
 
 from firebase_admin import auth, credentials
-from flask import Flask, request, session
+from flask import Flask, render_template, request, session
 from database import db
 from models import Exercise, Food, User
 import requests
@@ -40,14 +40,18 @@ def register():
         user = User(firebase_uid = firebase_user.uid, username = data['username'], email=data['email'], role = 'member')
         db.session.add(user)
         db.session.commit()
-        return {'uid': user.uid}, 201
+        return {'uid': firebase_user.uid}, 201
     except Exception as e:
         db.session.rollback()
         print('Registration Error: ', e)
         return{'error' : 'Registration failed'}, 400
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+
+    if request.method == 'GET':
+        return render_template('login.html')
+    
     data = request.get_json()
 
     firebase_auth_url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}"
@@ -70,6 +74,10 @@ def login():
 def logout():
     session.pop("user_id", None)
     return {'message': 'User logged out'}, 200
+
+@app.route('/')
+def home():
+    return render_template('landing.html')
 
 
 if __name__ == '__main__':
