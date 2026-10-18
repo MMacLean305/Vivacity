@@ -1,0 +1,169 @@
+name,muscle_group,description
+Bench Press,Chest,Barbell press performed on a flat bench
+Incline Bench Press,Chest,Barbell press performed on an incline bench
+Decline Bench Press,Chest,Barbell press performed on a decline bench
+Dumbbell Bench Press,Chest,Flat bench press using dumbbells
+Incline Dumbbell Press,Chest,Incline bench press using dumbbells
+Decline Dumbbell Press,Chest,Decline bench press using dumbbells
+Chest Fly,Chest,Dumbbell fly performed on a flat bench
+Incline Dumbbell Fly,Chest,Dumbbell fly performed on an incline bench
+Cable Chest Fly,Chest,Chest fly using cable handles
+Low to High Cable Fly,Chest,Upward cable fly emphasizing upper chest
+High to Low Cable Fly,Chest,Downward cable fly emphasizing lower chest
+Pec Deck Fly,Chest,Chest fly performed on a pec deck machine
+Machine Chest Press,Chest,Seated chest press using a machine
+Push Up,Chest,Bodyweight pressing movement from the floor
+Wide Grip Push Up,Chest,Push up performed with hands wider than shoulders
+Diamond Push Up,Triceps,Narrow hand position push up
+Chest Dip,Chest,Forward leaning dip emphasizing the chest
+Landmine Press,Shoulders,Angled barbell press with a landmine attachment
+Overhead Press,Shoulders,Standing barbell press overhead
+Seated Barbell Shoulder Press,Shoulders,Seated overhead press using a barbell
+Dumbbell Shoulder Press,Shoulders,Overhead press using dumbbells
+Arnold Press,Shoulders,Rotating dumbbell overhead press
+Machine Shoulder Press,Shoulders,Seated overhead press on a machine
+Dumbbell Lateral Raise,Shoulders,Raises dumbbells out to the sides
+Cable Lateral Raise,Shoulders,Raises a cable handle out to the side
+Machine Lateral Raise,Shoulders,Side raise using a shoulder machine
+Dumbbell Front Raise,Shoulders,Raises dumbbells forward to shoulder level
+Cable Front Raise,Shoulders,Front raise using a cable handle
+Rear Delt Fly,Shoulders,Bent over fly targeting rear deltoids
+Reverse Pec Deck,Shoulders,Rear shoulder fly on a reverse pec deck
+Face Pull,Shoulders,Cable pull toward the face with elbows raised
+Upright Row,Shoulders,Vertical pull with a barbell or cable
+Dumbbell Shrug,Traps,Shoulder elevation while holding dumbbells
+Barbell Shrug,Traps,Shoulder elevation while holding a barbell
+Pull Up,Back,Bodyweight vertical pull with palms facing away
+Chin Up,Back,Bodyweight vertical pull with palms facing inward
+Assisted Pull Up,Back,Pull up with machine or band assistance
+Lat Pulldown,Back,Seated cable pull toward the upper chest
+Close Grip Lat Pulldown,Back,Vertical cable pull using a narrow grip
+Straight Arm Pulldown,Back,Cable pull with mostly straight arms
+Barbell Bent Over Row,Back,Horizontal barbell row from a bent over position
+Pendlay Row,Back,Barbell row beginning each rep from the floor
+One Arm Dumbbell Row,Back,Single arm row with a dumbbell
+Chest Supported Dumbbell Row,Back,Incline bench supported dumbbell row
+Seated Cable Row,Back,Horizontal pull using a cable machine
+Wide Grip Seated Cable Row,Back,Seated cable row with a wide grip
+T Bar Row,Back,Row using a T bar attachment
+Machine Row,Back,Seated row using a machine
+Inverted Row,Back,Bodyweight row beneath a fixed bar
+Meadows Row,Back,Single arm landmine row
+Dumbbell Pullover,Back,Pullover movement using one dumbbell
+Back Extension,Lower Back,Hip hinge extension on a back extension bench
+Superman Hold,Lower Back,Prone bodyweight back extension hold
+Conventional Deadlift,Posterior Chain,Barbell deadlift from the floor
+Sumo Deadlift,Posterior Chain,Wide stance barbell deadlift
+Romanian Deadlift,Hamstrings,Hip hinge lowering a barbell along the legs
+Dumbbell Romanian Deadlift,Hamstrings,Romanian deadlift performed with dumbbells
+Single Leg Romanian Deadlift,Hamstrings,Hip hinge balancing on one leg
+Trap Bar Deadlift,Posterior Chain,Deadlift using a hexagonal trap bar
+Rack Pull,Posterior Chain,Partial deadlift beginning from an elevated position
+Good Morning,Hamstrings,Barbell hip hinge with bar on upper back
+Barbell Back Squat,Quadriceps,Barbell squat with the bar on the upper back
+Barbell Front Squat,Quadriceps,Barbell squat with the bar held in front
+Goblet Squat,Quadriceps,Squat holding one dumbbell or kettlebell
+Bulgarian Split Squat,Quadriceps,Rear foot elevated single leg squat
+Dumbbell Split Squat,Quadriceps,Stationary split stance squat using dumbbells
+Walking Lunge,Quadriceps,Alternating forward lunges while walking
+Reverse Lunge,Quadriceps,Stepping backward into a lunge
+Forward Lunge,Quadriceps,Stepping forward into a lunge
+Lateral Lunge,Adductors,Sideways lunge emphasizing inner thighs
+Step Up,Quadriceps,Stepping onto an elevated platform
+Leg Press,Quadriceps,Seated machine leg press
+Single Leg Press,Quadriceps,Leg press performed one leg at a time
+Hack Squat,Quadriceps,Machine guided squat movement
+Smith Machine Squat,Quadriceps,Squat using a guided barbell
+Leg Extension,Quadriceps,Seated knee extension using a machine
+Sissy Squat,Quadriceps,Bodyweight squat emphasizing knee extension
+Wall Sit,Quadriceps,Static squat hold against a wall
+Box Squat,Quadriceps,Squat onto a box or bench
+Jump Squat,Quadriceps,Explosive squat with a vertical jump
+Lying Leg Curl,Hamstrings,Prone knee flexion on a machine
+Seated Leg Curl,Hamstrings,Seated knee flexion on a machine
+Standing Leg Curl,Hamstrings,Single leg knee flexion on a machine
+Nordic Hamstring Curl,Hamstrings,Kneeling eccentric hamstring lowering movement
+Glute Ham Raise,Hamstrings,Bodyweight knee flexion on a glute ham bench
+Barbell Hip Thrust,Glutes,Hip extension with a barbell across the hips
+Glute Bridge,Glutes,Floor based hip extension movement
+Single Leg Glute Bridge,Glutes,Glute bridge using one supporting leg
+Cable Glute Kickback,Glutes,Cable hip extension with one leg
+Machine Hip Abduction,Glutes,Seated machine movement pressing knees outward
+Machine Hip Adduction,Adductors,Seated machine movement pressing knees inward
+Cable Hip Abduction,Glutes,Standing sideways hip raise using a cable
+Cable Hip Adduction,Adductors,Standing inward leg pull using a cable
+Kettlebell Swing,Posterior Chain,Explosive hip hinge swinging a kettlebell
+Standing Calf Raise,Calves,Ankle plantar flexion performed standing
+Seated Calf Raise,Calves,Ankle plantar flexion performed seated
+Single Leg Calf Raise,Calves,Calf raise using one leg
+Leg Press Calf Raise,Calves,Calf raise on a leg press machine
+Donkey Calf Raise,Calves,Bent over calf raise movement
+Tibialis Raise,Shins,Raises toes toward shins against resistance
+Barbell Bicep Curl,Biceps,Elbow flexion using a straight barbell
+EZ Bar Curl,Biceps,Elbow flexion using an angled curl bar
+Dumbbell Bicep Curl,Biceps,Elbow flexion using dumbbells
+Alternating Dumbbell Curl,Biceps,Alternating single arm dumbbell curls
+Hammer Curl,Biceps,Dumbbell curl using a neutral grip
+Incline Dumbbell Curl,Biceps,Dumbbell curl on an incline bench
+Preacher Curl,Biceps,Supported curl using a preacher bench
+Concentration Curl,Biceps,Seated single arm curl with elbow supported
+Cable Bicep Curl,Biceps,Elbow flexion with a cable attachment
+Spider Curl,Biceps,Prone incline bench curl
+Reverse Curl,Forearms,Palms down curl using a bar
+Zottman Curl,Biceps,Dumbbell curl with a rotating grip
+Tricep Pushdown,Triceps,Cable elbow extension with arms by the sides
+Rope Tricep Pushdown,Triceps,Cable pushdown using a rope handle
+Overhead Cable Tricep Extension,Triceps,Overhead elbow extension using a cable
+Overhead Dumbbell Tricep Extension,Triceps,Overhead elbow extension holding a dumbbell
+Skull Crusher,Triceps,Lying elbow extension with a bar
+Close Grip Bench Press,Triceps,Barbell bench press using a narrow grip
+Bench Dip,Triceps,Bodyweight dip using a bench for hand support
+Parallel Bar Dip,Triceps,Bodyweight dip performed between parallel bars
+Tricep Kickback,Triceps,Bent over dumbbell elbow extension
+Machine Tricep Extension,Triceps,Elbow extension using a dedicated machine
+Wrist Curl,Forearms,Palms up wrist flexion using resistance
+Reverse Wrist Curl,Forearms,Palms down wrist extension using resistance
+Farmer Carry,Forearms,Walking while carrying heavy weights
+Dead Hang,Forearms,Static hanging grip exercise
+Plate Pinch Hold,Forearms,Holding weight plates with a pinch grip
+Plank,Core,Static forearm support position
+Side Plank,Core,Static lateral support position
+Crunch,Core,Short range trunk flexion from the floor
+Bicycle Crunch,Core,Alternating rotational crunch movement
+Reverse Crunch,Core,Lifting pelvis toward torso while lying down
+Hanging Knee Raise,Core,Raising knees while hanging from a bar
+Hanging Leg Raise,Core,Raising straight legs while hanging from a bar
+Lying Leg Raise,Core,Raising legs while lying on the floor
+Cable Crunch,Core,Kneeling trunk flexion with cable resistance
+Russian Twist,Core,Seated torso rotation movement
+Ab Wheel Rollout,Core,Rolling forward and returning using an ab wheel
+Dead Bug,Core,Alternating opposite arm and leg extension on the floor
+Bird Dog,Core,Opposite arm and leg extension from all fours
+Mountain Climber,Core,Alternating knee drive in a high plank position
+Pallof Press,Core,Anti rotation cable press from the chest
+Woodchopper,Core,Diagonal rotational cable movement
+Sit Up,Core,Full trunk flexion from a supine position
+V Up,Core,Simultaneous torso and leg raise
+Hollow Body Hold,Core,Static hollow body floor hold
+Backpack Carry,Core,Weighted carry while holding a load on the back
+Burpee,Full Body,Squat thrust with a push up and jump variation
+Thruster,Full Body,Front squat flowing into an overhead press
+Clean and Press,Full Body,Lift weight to shoulders then press overhead
+Power Clean,Full Body,Explosive barbell lift from floor to shoulders
+Hang Clean,Full Body,Explosive barbell lift from above the knees
+Kettlebell Clean,Full Body,Explosive kettlebell movement to rack position
+Turkish Get Up,Full Body,Transition from lying to standing while holding weight
+Battle Ropes,Full Body,Repeated waves with heavy training ropes
+Sled Push,Full Body,Pushing a weighted sled across the floor
+Sled Pull,Full Body,Pulling a weighted sled across the floor
+Box Jump,Full Body,Jumping onto a stable raised platform
+Jumping Jack,Cardio,Repeated jumping while spreading arms and legs
+Jump Rope,Cardio,Repeated jumps while turning a rope
+Treadmill Running,Cardio,Running on a treadmill
+Stationary Cycling,Cardio,Cycling on a stationary bike
+Rowing Machine,Cardio,Repeated rowing strokes on an ergometer
+Elliptical Trainer,Cardio,Continuous stride movement on an elliptical
+Stair Climber,Cardio,Stepping continuously on a stair climbing machine
+Walking,Cardio,Continuous walking for general conditioning
+Outdoor Running,Cardio,Running on an outdoor route
+Swimming,Cardio,Swimming laps for aerobic conditioning
