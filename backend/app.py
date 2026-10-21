@@ -3,7 +3,7 @@ import firebase_admin
 from firebase_admin import auth, credentials
 from flask import Flask, render_template, request, session
 from database import db
-from models import Exercise, Food, User
+from models import Exercise, Food, User, SessionLog, ExerciseLog
 import requests
 import os
 
