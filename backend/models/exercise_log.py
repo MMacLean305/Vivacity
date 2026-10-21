@@ -5,6 +5,7 @@ class ExerciseLog(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     exercise_id = db.Column(db.Integer, db.ForeignKey('exercises.id'))
+    session_id = db.Column(db.Integer, db.ForeignKey('session_log.id'))
     reps = db.Column(db.Integer)
     sets = db.Column(db.Integer)
     weight = db.Column(db.Integer)
