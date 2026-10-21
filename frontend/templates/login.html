@@ -6,19 +6,24 @@
     <title>>Login Page | Vivacity</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-
 </head>
 <body>
+    <header class="nav">
+        <a class="nav-link" href="{{ url_for('landing') }}">Vivacity</a>
+    </header>
+
     <div class="wrapper">
-        <form action="">
+        <script type="text/javascript" src="{{url_for('static', filename='validation.js')}}"  defer></script>
+        <form id="form" action="" novalidate>
             <h1>Login to Vivacity</h1>
+            <p id="error-message"></p>
             <div class="input-box">
-                <input type="text" placeholder="Username" required>
+                <input type="text" id="username-input" name="username" placeholder="Username">
                 <i class='bx bx-user'></i>
             </div>
             <div class="input-box">
-                <input type="password" placeholder="Password" required>
-                <i class='bx bx-lock-alt' ></i>
+                <input type="password" id="password-input" name="password" placeholder="Password">
+                <i class='bx bx-lock-alt'></i>
             </div>
             <div class="remember-forgot">
                 <label><input type="checkbox">Remember Me</label>
@@ -26,7 +31,7 @@
             </div>
             <button type="submit" class="button">Login</button>
             <div class="register-link">
-                <p>Don't have an account? <a href="#">Register</a></p>
+                <p>Don't have an account? <a href="{{ url_for('signup') }}">Register</a></p>
             </div>
         </form>
     </div>
