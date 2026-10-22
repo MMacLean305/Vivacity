@@ -43,6 +43,10 @@ def register():
         return {'uid': firebase_user.uid}, 201
     except Exception as e:
         db.session.rollback()
+
+        if 'firebase_user' in locals():
+            auth.delete_user(firebase_user.uid)
+        
         print('Registration Error: ', e)
         return{'error' : 'Registration failed'}, 400
 
@@ -54,8 +58,12 @@ def login():
     
     data = request.get_json()
 
+    user = User.query.filter_by(username=data['username']).first()
+    if not user:
+        return {'error': 'Invalid username or password'}, 404
+
     firebase_auth_url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}"
-    payload = {"email": data['email'], "password": data['password'], "returnSecureToken": True}
+    payload = {"email": user.email, "password": data['password'], "returnSecureToken": True}
 
     try:
         response = requests.post(firebase_auth_url, json=payload)
