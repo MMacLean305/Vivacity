@@ -102,5 +102,15 @@ def get_exercises():
             "id": e.id, "name" : e.name, 'muscle_group': e.muscle_group, "description": e.description})
     return res, 200
 
+#Should probably add some safety checks!!!!!!
+@app.route("/api/sessions", methods = ["POST"])
+def make_session():
+    firebase_uid = session.get('user_id')
+    user = User.query.filter_by(firebase_uid = firebase_uid).first()
+    new_session = SessionLog(user_id = user.id)
+    db.session.add(new_session)
+    db.session.commit()
+    return {'session_id': new_session.id}, 201
+
 if __name__ == '__main__':
     app.run()
