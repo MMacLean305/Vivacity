@@ -6,8 +6,8 @@ const password_input = document.getElementById('password-input')
 const repeat_password_input = document.getElementById('repeat-password-input')
 const error_message = document.getElementById('error-message')
 
-form.addEventListener('submit', (e) => {
-    //e.preventDefault()
+form.addEventListener('submit', async (e) => {
+    e.preventDefault()
 
     let errors = []
 
@@ -19,9 +19,29 @@ form.addEventListener('submit', (e) => {
         errors = getLoginFormErrors(username_input.value, password_input.value)
     }
     if(errors.length > 0){
-        e.preventDefault()
+        
         error_message.innerText = errors.join(". ")
+        return
     }
+
+    const url = email_input ? '/register' : '/login'
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            username: username_input.value,
+            email: email_input ? email_input.value : null,
+            password: password_input.value
+        })
+    })
+
+    const res  = await response.json()
+    if(response.ok){
+        window.location.href = email_input ? '/login' : '/'
+    }else{
+        error_message.innerText = res.error
+    }
+
 })
 
 function getSignupFormErrors(username,email,password,repeatPassword){
