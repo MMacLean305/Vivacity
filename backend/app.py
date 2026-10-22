@@ -3,7 +3,7 @@ import firebase_admin
 from firebase_admin import auth, credentials
 from flask import Flask, render_template, request, session
 from database import db
-from models import Exercise, Food, User
+from models import Exercise, Food, User, SessionLog, ExerciseLog, FoodLog
 import requests
 import os
 
@@ -76,9 +76,23 @@ def logout():
     return {'message': 'User logged out'}, 200
 
 @app.route('/')
-def home():
+def landing():
     return render_template('landing.html')
 
+@app.route("/signup")
+def signup():
+    return render_template("signup.html")
+
+@app.route('/api/exercises', methods = ['GET'])
+def get_exercises():
+    input_ = request.args.get('search', '')
+    exercises = Exercise.query.filter(Exercise.name.ilike(f"%{input_}%")).all()
+
+    res = []
+    for e in exercises:
+        res.append({
+            "id": e.id, "name" : e.name, 'muscle_group': e.muscle_group, "description": e.description})
+    return res, 200
 
 if __name__ == '__main__':
     app.run()

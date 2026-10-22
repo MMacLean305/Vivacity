@@ -6,15 +6,30 @@
 }
 body{
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
     min-height: 100vh;
     background-color: rgb(14, 80, 80);
     background-size: cover;
-    background-position: cover;
+    background-position: center;
+}
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 40px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+}
+.nav-link {
+    color: rgb(14, 80, 80);
+    text-decoration: none;
+    font-weight: 600;
+
 }
 .wrapper{
     width: 420px;
+    margin: auto;
+    background: rgb(14, 80, 80);
     color: white;
     border-radius: 20px;
     padding: 30px 30px
