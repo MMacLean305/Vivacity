@@ -106,11 +106,55 @@ def get_exercises():
 @app.route("/api/sessions", methods = ["POST"])
 def make_session():
     firebase_uid = session.get('user_id')
+    if firebase_uid is None:
+        return {"error": "Authentication error"}, 401
+
     user = User.query.filter_by(firebase_uid = firebase_uid).first()
     new_session = SessionLog(user_id = user.id)
     db.session.add(new_session)
     db.session.commit()
     return {'session_id': new_session.id}, 201
+
+#ALSO SHOULD HAVE SOME SAFETY CHECKS!!!!!
+@app.route("/api/exercise-log", methods = ["POST"])
+def make_exercise_log():
+    firebase_uid = session.get('user_id')
+    if firebase_uid is None:
+        return {"error": "Authentication error"}, 401
+
+    data = request.get_json(silent = True)
+    if not isinstance(data, dict):
+        return {"error": "Invalid JSON"}, 400
+
+    user = User.query.filter_by(firebase_uid = firebase_uid).first()
+    if user is None:
+        return {"error": "Invalid user"}, 404
+
+    ses = db.session.get(SessionLog, data.get("session_id"))
+    if ses is None:
+        return {"error" : "Invalid session"}, 404
+    if ses.user_id != user.id:
+        return {"error" : "Authorization error"}, 403
+
+    ex_id = db.session.get(Exercise, data.get("exercise_id"))
+    if ex_id is None:
+        return {"error" : "Invalid exercise"}, 404
+
+    reps = data.get("reps")
+    if type(reps) != int  or reps <= 0:
+        return {"error" : "Invalid rep number"}, 400
+    sets = data.get("sets")
+    if type(sets) != int or sets <= 0:
+        return {"error" : "Invalid set number"}, 400
+    weight = data.get("weight")
+    if (type(weight) != float and type(weight) != int) or weight < 0:
+        return {"error" : "Invalid weight"}, 400
+
+    new_entry = ExerciseLog(session_id = ses.id, exercise_id = ex_id.id, reps = reps, sets = sets, weight = weight)
+    db.session.add(new_entry)
+    db.session.commit()
+    return {'exerciselog_id': new_entry.id}, 201
+
 
 if __name__ == '__main__':
     app.run()
