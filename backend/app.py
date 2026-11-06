@@ -6,6 +6,7 @@ from database import db
 from models import Exercise, Food, User, SessionLog, ExerciseLog, FoodLog
 import requests
 import os
+from datetime import date
 
 from dotenv import load_dotenv
 
@@ -29,6 +30,8 @@ with app.app_context():
     db.create_all()
 
 FIREBASE_API_KEY = os.getenv('FIREBASE_API_KEY')
+USDA_API_KEY = os.getenv('USDA_API_KEY')
+USDA_BASE = "https://api.nal.usda.gov/fdc/v1"
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -91,6 +94,15 @@ def landing():
 def signup():
     return render_template("signup.html")
 
+@app.route("/api/me", methods=['GET'])
+def get_me():
+    user = get_current_user()
+    if user is None:
+        return {"error": "Authentication error"}, 401
+    return {"username": user.username, "email": user.email}, 200
+
+
+
 @app.route('/api/exercises', methods = ['GET'])
 def get_exercises():
     input_ = request.args.get('search', '')
@@ -102,7 +114,7 @@ def get_exercises():
             "id": e.id, "name" : e.name, 'muscle_group': e.muscle_group, "description": e.description})
     return res, 200
 
-#Should probably add some safety checks!!!!!!
+
 @app.route("/api/sessions", methods = ["POST"])
 def make_session():
     firebase_uid = session.get('user_id')
@@ -110,6 +122,8 @@ def make_session():
         return {"error": "Authentication error"}, 401
 
     user = User.query.filter_by(firebase_uid = firebase_uid).first()
+    if user is None:
+        return {"error": "Invalid user"}, 404
     new_session = SessionLog(user_id = user.id)
     db.session.add(new_session)
     db.session.commit()
@@ -155,6 +169,28 @@ def make_exercise_log():
     db.session.commit()
     return {'exerciselog_id': new_entry.id}, 201
 
+def get_current_user():
+    fid = session.get('user_id')
+    if fid is None:
+        return None
+    return User.query.filter_by(firebase_uid = fid).first()
+
+def get_food(fdc_id):
+    food = Food.query.filter_by(fdc_id = fdc_id).first()
+    if food:
+        return food
+    try:
+        response = requests.get(f"{USDA_BASE}/food/{fdc_id}", params={"api_key": USDA_API_KEY}, timeout=10)
+
+    except requests.RequestException:
+        return None
+    if response.status_code != 200:
+        return None
+    data = response.json()
+    food = Food(fdc_id = food_id, name = data['description'], calories = data['calories'])
+    db.session.add(food)
+    db.session.commit()
+    return food
 
 if __name__ == '__main__':
     app.run()
