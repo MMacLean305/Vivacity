@@ -180,7 +180,7 @@ def delete_session():
 
 #######################################################################
 
-#ALSO SHOULD HAVE SOME SAFETY CHECKS!!!!!
+#EXERCISE LOG ENDPOINTS#
 @app.route("/api/exercise-log", methods = ["POST"])
 def make_exercise_log():
     firebase_uid = session.get('user_id')
@@ -219,6 +219,9 @@ def make_exercise_log():
     db.session.add(new_entry)
     db.session.commit()
     return {'exerciselog_id': new_entry.id}, 201
+
+#######################################################################
+
 
 def get_current_user():
     fid = session.get('user_id')
