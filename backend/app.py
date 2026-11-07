@@ -139,6 +139,18 @@ def get_sessions():
     for s in sessions:
         result.append({"id" : s.id, "date": s.date.isofortmat()})
     return result, 200
+
+app.route("/api/sessions/<int:id>", method = ["GET"])
+def get_session(id):
+    user = get_current_user()
+    if user is None:
+        return {"error": "Authentication error"}, 401
+    s = SessionLog.query.filter_by(id = id, user_id = user.id)
+    if s is None:
+        return {"error": "Session not found"}, 404
+    log = ExerciseLog.query.filter_by(session_id = s.id).all()
+    result = { 'session_id': s.id, 'date': s.date.isoformat(),'exercises': [{'id': log.id, 'exercise_id': log.exercise_id, 'sets': log.sets, 'reps': log.reps, 'weight': log.weight} for l in log]}
+    return result
 #######################################################################
 
 #ALSO SHOULD HAVE SOME SAFETY CHECKS!!!!!
