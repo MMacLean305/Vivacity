@@ -129,7 +129,7 @@ def make_session():
     db.session.commit()
     return {'session_id': new_session.id}, 201
 
-app.route("/api/sessions", method = ["GET"])
+@app.route("/api/sessions", method = ["GET"])
 def get_sessions():
     user = get_current_user()
     if user is None:
@@ -140,7 +140,7 @@ def get_sessions():
         result.append({"id" : s.id, "date": s.date.isofortmat()})
     return result, 200
 
-app.route("/api/sessions/<int:id>", method = ["GET"])
+@app.route("/api/sessions/<int:id>", method = ["GET"])
 def get_session(id):
     user = get_current_user()
     if user is None:
@@ -151,6 +151,19 @@ def get_session(id):
     log = ExerciseLog.query.filter_by(session_id = s.id).all()
     result = { 'session_id': s.id, 'date': s.date.isoformat(),'exercises': [{'id': log.id, 'exercise_id': log.exercise_id, 'sets': log.sets, 'reps': log.reps, 'weight': log.weight} for l in log]}
     return result
+
+@app.route("/api/sessions/<int:id>", method = ["DELETE"])
+def delete_session(id):
+    user = get_current_user()
+    if user is None:
+        return {"error": "Authentication error"}, 401
+    s = SessionLog.query.filter_by(id = id, user_id = user.id).first()
+    if s is None:
+        return {"error": "Session not found"}, 404
+    ExerciseLog.query.filter_by(session_id = s.id).delete()
+    db.session.delete(s)
+    db.session.commit()
+    return {'message' : "Session delete success"}, 200
 #######################################################################
 
 #ALSO SHOULD HAVE SOME SAFETY CHECKS!!!!!
