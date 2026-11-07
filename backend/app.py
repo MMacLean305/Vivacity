@@ -114,7 +114,7 @@ def get_exercises():
             "id": e.id, "name" : e.name, 'muscle_group': e.muscle_group, "description": e.description})
     return res, 200
 
-
+#SESSION ENDPOINTS#
 @app.route("/api/sessions", methods = ["POST"])
 def make_session():
     firebase_uid = session.get('user_id')
@@ -128,6 +128,18 @@ def make_session():
     db.session.add(new_session)
     db.session.commit()
     return {'session_id': new_session.id}, 201
+
+app.route("/api/sessions", method = ["GET"])
+def get_sessions():
+    user = get_current_user()
+    if user is None:
+        return {"error": "Authentication error"}, 401
+    sessions = SessionLog.query.filter_by(user_id = user.id).all()
+    result = []
+    for s in sessions:
+        result.append({"id" : s.id, "date": s.date.isofortmat()})
+    return result, 200
+#######################################################################
 
 #ALSO SHOULD HAVE SOME SAFETY CHECKS!!!!!
 @app.route("/api/exercise-log", methods = ["POST"])
@@ -191,6 +203,8 @@ def get_food(fdc_id):
     db.session.add(food)
     db.session.commit()
     return food
+
+
 
 if __name__ == '__main__':
     app.run()
