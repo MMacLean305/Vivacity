@@ -181,7 +181,7 @@ def delete_session():
 #######################################################################
 
 #EXERCISE LOG ENDPOINTS#
-@app.route("/api/exercise-log", methods = ["POST"])
+@app.route("/api/exercise-logs", methods = ["POST"])
 def make_exercise_log():
     firebase_uid = session.get('user_id')
     if firebase_uid is None:
@@ -219,6 +219,16 @@ def make_exercise_log():
     db.session.add(new_entry)
     db.session.commit()
     return {'exerciselog_id': new_entry.id}, 201
+
+#@app.route("/api/exercise-logs", methods = ["GET"])
+#def get_sessions():
+
+#@app.route("/api/exercise-logs/<int:id>", methods = ["GET"])
+#def get_session(id):
+
+#@app.route("/api/exercise-logs/<int:id>", methods = ["PATCH"])
+
+#@app.route("/api/exercise-logs/<int:id>", methods = ["DELETE"])
 
 #######################################################################
 
