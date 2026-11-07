@@ -4,7 +4,7 @@ from app import app
 from database import db
 from models import Exercise
 
-csv_file = os.path.join(os.path.dirname(__file__), "data", "exercises.csv")
+csv_file = os.path.join(os.path.dirname(__file__), "..", "data", "exercises.csv")
 
 with app.app_context():
     with open(csv_file, newline = '', encoding = 'utf-8-sig') as file:

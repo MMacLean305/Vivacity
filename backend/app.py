@@ -114,7 +114,7 @@ def get_exercises():
             "id": e.id, "name" : e.name, 'muscle_group': e.muscle_group, "description": e.description})
     return res, 200
 
-
+#SESSION ENDPOINTS#
 @app.route("/api/sessions", methods = ["POST"])
 def make_session():
     firebase_uid = session.get('user_id')
@@ -128,6 +128,57 @@ def make_session():
     db.session.add(new_session)
     db.session.commit()
     return {'session_id': new_session.id}, 201
+
+@app.route("/api/sessions", methods = ["GET"])
+def get_sessions():
+    user = get_current_user()
+    if user is None:
+        return {"error": "Authentication error"}, 401
+    sessions = SessionLog.query.filter_by(user_id = user.id).all()
+    result = []
+    for s in sessions:
+        result.append({"id" : s.id, "date": s.date.isofortmat()})
+    return result, 200
+
+@app.route("/api/sessions/<int:id>", methods = ["GET"])
+def get_session(id):
+    user = get_current_user()
+    if user is None:
+        return {"error": "Authentication error"}, 401
+    s = SessionLog.query.filter_by(id = id, user_id = user.id)
+    if s is None:
+        return {"error": "Session not found"}, 404
+    log = ExerciseLog.query.filter_by(session_id = s.id).all()
+    result = { 'session_id': s.id, 'date': s.date.isoformat(),'exercises': [{'id': log.id, 'exercise_id': log.exercise_id, 'sets': log.sets, 'reps': log.reps, 'weight': log.weight} for l in log]}
+    return result
+
+@app.route("/api/sessions/<int:id>", methods = ["DELETE"])
+def delete_session(id):
+    user = get_current_user()
+    if user is None:
+        return {"error": "Authentication error"}, 401
+    s = SessionLog.query.filter_by(id = id, user_id = user.id).first()
+    if s is None:
+        return {"error": "Session not found"}, 404
+    ExerciseLog.query.filter_by(session_id = s.id).delete()
+    db.session.delete(s)
+    db.session.commit()
+    return {'message' : "Session delete success"}, 200
+
+@app.route("/api/sessions", methods = ["DELETE"])
+def delete_session():
+    user = get_current_user()
+    if user is None:
+        return {"error": "Authentication error"}, 401
+    sessions = SessionLog.query.filter_by(user_id=user.id).all()
+    session_ids = [s.id for s in sessions]
+    if session_ids:
+        ExerciseLog.query.filter(ExerciseLog.session_id.in_(session_ids)).delete(synchronize_session = False)
+        SessionLog.query.filter(SessionLog.user_id == user.id).delete(synchronize_session = False)
+    db.session.commit()
+    return {"message" : "All sessions deleted successfully", "deleted_sessions" : len(session_ids)}, 200
+
+#######################################################################
 
 #ALSO SHOULD HAVE SOME SAFETY CHECKS!!!!!
 @app.route("/api/exercise-log", methods = ["POST"])
@@ -191,6 +242,8 @@ def get_food(fdc_id):
     db.session.add(food)
     db.session.commit()
     return food
+
+
 
 if __name__ == '__main__':
     app.run()
