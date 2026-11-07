@@ -129,7 +129,7 @@ def make_session():
     db.session.commit()
     return {'session_id': new_session.id}, 201
 
-@app.route("/api/sessions", method = ["GET"])
+@app.route("/api/sessions", methods = ["GET"])
 def get_sessions():
     user = get_current_user()
     if user is None:
@@ -140,7 +140,7 @@ def get_sessions():
         result.append({"id" : s.id, "date": s.date.isofortmat()})
     return result, 200
 
-@app.route("/api/sessions/<int:id>", method = ["GET"])
+@app.route("/api/sessions/<int:id>", methods = ["GET"])
 def get_session(id):
     user = get_current_user()
     if user is None:
@@ -152,7 +152,7 @@ def get_session(id):
     result = { 'session_id': s.id, 'date': s.date.isoformat(),'exercises': [{'id': log.id, 'exercise_id': log.exercise_id, 'sets': log.sets, 'reps': log.reps, 'weight': log.weight} for l in log]}
     return result
 
-@app.route("/api/sessions/<int:id>", method = ["DELETE"])
+@app.route("/api/sessions/<int:id>", methods = ["DELETE"])
 def delete_session(id):
     user = get_current_user()
     if user is None:
@@ -164,6 +164,20 @@ def delete_session(id):
     db.session.delete(s)
     db.session.commit()
     return {'message' : "Session delete success"}, 200
+
+@app.route("/api/sessions", methods = ["DELETE"])
+def delete_session():
+    user = get_current_user()
+    if user is None:
+        return {"error": "Authentication error"}, 401
+    sessions = SessionLog.query.filter_by(user_id=user.id).all()
+    session_ids = [s.id for s in sessions]
+    if session_ids:
+        ExerciseLog.query.filter(ExerciseLog.session_id.in_(session_ids)).delete(synchronize_session = False)
+        SessionLog.query.filter(SessionLog.user_id == user.id).delete(synchronize_session = False)
+    db.session.commit()
+    return {"message" : "All sessions deleted successfully", "deleted_sessions" : len(session_ids)}, 200
+
 #######################################################################
 
 #ALSO SHOULD HAVE SOME SAFETY CHECKS!!!!!
