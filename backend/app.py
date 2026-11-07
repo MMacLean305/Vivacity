@@ -220,15 +220,26 @@ def make_exercise_log():
     db.session.commit()
     return {'exerciselog_id': new_entry.id}, 201
 
-#@app.route("/api/exercise-logs", methods = ["GET"])
-#def get_sessions():
+@app.route("/api/exercise-logs", methods = ["GET"])
+def get_exercise_logs():
+    user = get_current_user()
+    if user is None:
+        return {"error": "Authentication error"}, 401
+    log = (ExerciseLog.query.join(SessionLog, ExerciseLog.session_id == SessionLog.id).filter(SessionLog.user_id == user.id).all())
+    res = []
+    for l in log:
+        res.append({"id" : l.id, "session_id" : l.session_id, "exercise_id" : l.exercise_id, "sets" : l.sets, "reps" : l.reps, "weight" : log.weight})
+    return res, 200
+
 
 #@app.route("/api/exercise-logs/<int:id>", methods = ["GET"])
-#def get_session(id):
+#def get_exercise_log(id):
 
 #@app.route("/api/exercise-logs/<int:id>", methods = ["PATCH"])
+#def edit_exercise_log(id):
 
 #@app.route("/api/exercise-logs/<int:id>", methods = ["DELETE"])
+#def delete_exercise_log(id):
 
 #######################################################################
 
