@@ -230,13 +230,40 @@ def get_exercise_logs():
     for l in log:
         res.append({"id" : l.id, "session_id" : l.session_id, "exercise_id" : l.exercise_id, "sets" : l.sets, "reps" : l.reps, "weight" : log.weight})
     return res, 200
-
-
-#@app.route("/api/exercise-logs/<int:id>", methods = ["GET"])
-#def get_exercise_log(id):
-
-#@app.route("/api/exercise-logs/<int:id>", methods = ["PATCH"])
-#def edit_exercise_log(id):
+'''
+@app.route("/api/exercise-logs/<int:id>", methods = ["GET"])
+ def get_exercise_log(id):
+    user = get_current_user()
+    if user is None:
+        return {"error": "Authentication error"}, 401
+    res = {}
+    return res, 200
+'''
+@app.route("/api/exercise-logs/<int:id>", methods = ["PATCH"])
+def edit_exercise_log(id):
+    changes = []
+    user = get_current_user()
+    if user is None:
+        return {"error": "Authentication error"}, 401
+    req = request.get_json(silent = True)
+    if not isinstance(req, dict):
+        return {"error" : "Improper JSON"}, 400
+    log = (ExerciseLog.query.join(SessionLog, ExerciseLog.session_id == SessionLog.id).filter(ExerciseLog.id == id, SessionLog.user_id == user.id).first())
+    if log is None:
+        return {"error" : "Exercise log not found"}, 404
+    if "sets" in req:
+        log.sets = req["sets"]
+        changes.append("sets")
+    if "weight" in req:
+        log.weight = req["weight"]
+        changes.append("weight")
+    if "reps" in req:
+        log.reps = req["reps"]
+        changes.append("reps")
+    if not changes:
+        return {"error" : "No valid fields"}, 400
+    db.session.commit()
+    return {"message" : "Exercise log edit successful", "log_id" : log.id, "updated fields" : changes}, 200
 
 #@app.route("/api/exercise-logs/<int:id>", methods = ["DELETE"])
 #def delete_exercise_log(id):
