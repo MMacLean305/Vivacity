@@ -1,7 +1,7 @@
 import firebase_admin
 import math
 from firebase_admin import auth, credentials
-from flask import Flask, render_template, request, session
+from flask import Flask, redirect, render_template, request, session
 from database import db
 from models import Exercise, Food, User, SessionLog, ExerciseLog, FoodLog
 import requests
@@ -39,6 +39,13 @@ def landing():
 #######################################################################
 
 #LOGIN / REGISTER ENDPOINTS#
+@app.route('/dashboard')
+def dashboard():
+    user = get_current_user()
+    if user is None:
+        return redirect('/login')
+    return render_template('dashboard.html')
+
 @app.route('/register', methods=['POST'])
 def register():
 
