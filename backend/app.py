@@ -32,7 +32,13 @@ with app.app_context():
 FIREBASE_API_KEY = os.getenv('FIREBASE_API_KEY')
 USDA_API_KEY = os.getenv('USDA_API_KEY')
 USDA_BASE = "https://api.nal.usda.gov/fdc/v1"
+#LANDING PAGE#
+@app.route('/')
+def landing():
+    return render_template('landing.html')
+#######################################################################
 
+#LOGIN / REGISTER ENDPOINTS#
 @app.route('/register', methods=['POST'])
 def register():
 
@@ -86,10 +92,6 @@ def logout():
     session.pop("user_id", None)
     return {'message': 'User logged out'}, 200
 
-@app.route('/')
-def landing():
-    return render_template('landing.html')
-
 @app.route("/signup")
 def signup():
     return render_template("signup.html")
@@ -100,9 +102,9 @@ def get_me():
     if user is None:
         return {"error": "Authentication error"}, 401
     return {"username": user.username, "email": user.email}, 200
+#######################################################################
 
-
-
+#EXERCISE ENDPOINTS#
 @app.route('/api/exercises', methods = ['GET'])
 def get_exercises():
     input_ = request.args.get('search', '')
@@ -113,6 +115,7 @@ def get_exercises():
         res.append({
             "id": e.id, "name" : e.name, 'muscle_group': e.muscle_group, "description": e.description})
     return res, 200
+#######################################################################
 
 #SESSION ENDPOINTS#
 @app.route("/api/sessions", methods = ["POST"])
