@@ -322,6 +322,21 @@ def get_food(fdc_id):
     db.session.commit()
     return food
 
+@app.route('/api/food-logs', methods=['GET'])
+def get_food_logs():
+    user = get_current_user()
+    if user is None:
+        return {"error" : "Authentication Error"}, 401
+
+    logs = FoodLog.query.filter_by(user_id = user.id).all()
+    res = []
+    for log in logs:
+        food = db.session.get(Food, log.food_id)
+        res.append({"id" : log.id, "food_id" : log.food_id, "food_name" : food.name, "calories" : food.calories, "protein" : food.protein, "fat" : food.fats, "carbs" : food.carbs, "servings" : log.servings})
+    return res, 200
+    
+
+
 
 
 if __name__ == '__main__':
