@@ -1,5 +1,5 @@
 import firebase_admin
-
+import math
 from firebase_admin import auth, credentials
 from flask import Flask, redirect, render_template, request, session
 from database import db
@@ -32,7 +32,13 @@ with app.app_context():
 FIREBASE_API_KEY = os.getenv('FIREBASE_API_KEY')
 USDA_API_KEY = os.getenv('USDA_API_KEY')
 USDA_BASE = "https://api.nal.usda.gov/fdc/v1"
+#LANDING PAGE#
+@app.route('/')
+def landing():
+    return render_template('landing.html')
+#######################################################################
 
+#LOGIN / REGISTER ENDPOINTS#
 @app.route('/dashboard')
 def dashboard():
     user = get_current_user()
@@ -93,10 +99,6 @@ def logout():
     session.pop("user_id", None)
     return {'message': 'User logged out'}, 200
 
-@app.route('/')
-def landing():
-    return render_template('landing.html')
-
 @app.route("/signup")
 def signup():
     return render_template("signup.html")
@@ -107,9 +109,9 @@ def get_me():
     if user is None:
         return {"error": "Authentication error"}, 401
     return {"username": user.username, "email": user.email}, 200
+#######################################################################
 
-
-
+#EXERCISE ENDPOINTS#
 @app.route('/api/exercises', methods = ['GET'])
 def get_exercises():
     input_ = request.args.get('search', '')
@@ -120,6 +122,7 @@ def get_exercises():
         res.append({
             "id": e.id, "name" : e.name, 'muscle_group': e.muscle_group, "description": e.description})
     return res, 200
+#######################################################################
 
 #SESSION ENDPOINTS#
 @app.route("/api/sessions", methods = ["POST"])
@@ -237,15 +240,19 @@ def get_exercise_logs():
     for l in log:
         res.append({"id" : l.id, "session_id" : l.session_id, "exercise_id" : l.exercise_id, "sets" : l.sets, "reps" : l.reps, "weight" : log.weight})
     return res, 200
-'''
+
 @app.route("/api/exercise-logs/<int:id>", methods = ["GET"])
- def get_exercise_log(id):
+def get_exercise_log(id):
     user = get_current_user()
     if user is None:
         return {"error": "Authentication error"}, 401
-    res = {}
+
+    log = (ExerciseLog.query.join(SessionLog, ExerciseLog.session_id == SessionLog.id).filter(ExerciseLog.id == id, SessionLog.user_id == user.id).first())
+    if log is None:
+        return {"error" : "Exercise log not found"}, 404
+    res = {"id" : log.id, "session_id" : log.session_id, "exercise_id" : log.exercise_id, "sets" : log.sets, "reps" : log.reps, "weight" : log.weight}
     return res, 200
-'''
+
 @app.route("/api/exercise-logs/<int:id>", methods = ["PATCH"])
 def edit_exercise_log(id):
     changes = []
@@ -259,21 +266,35 @@ def edit_exercise_log(id):
     if log is None:
         return {"error" : "Exercise log not found"}, 404
     if "sets" in req:
-        log.sets = req["sets"]
+        if type(req["sets"]) != int or req["sets"] < 0:
+            return {"error" : "Invalid sets entry"}, 400
         changes.append("sets")
     if "weight" in req:
-        log.weight = req["weight"]
+        if type(req["weight"]) not in (int, float) or not math.isfinite(req["weight"]) or req["weight"] < 0:
+            return {"error" : "Invalid weight entry"}, 400
         changes.append("weight")
     if "reps" in req:
-        log.reps = req["reps"]
+        if type(req["reps"]) != int or req["reps"] < 0:
+            return {"error" : "Invalid reps entry"}, 400
         changes.append("reps")
     if not changes:
         return {"error" : "No valid fields"}, 400
+    for field in changes:
+        setattr(log, field, req[field])
     db.session.commit()
-    return {"message" : "Exercise log edit successful", "log_id" : log.id, "updated fields" : changes}, 200
+    return {"message" : "Exercise log edit successful", "log_id" : log.id, "updated_fields" : changes}, 200
 
-#@app.route("/api/exercise-logs/<int:id>", methods = ["DELETE"])
-#def delete_exercise_log(id):
+@app.route("/api/exercise-logs/<int:id>", methods = ["DELETE"])
+def delete_exercise_log(id):
+    user = get_current_user()
+    if user is None:
+        return {"error": "Authentication error"}, 401
+    log = (ExerciseLog.query.join(SessionLog, ExerciseLog.session_id == SessionLog.id).filter(ExerciseLog.id == id, SessionLog.user_id == user.id).first())
+    if log is None:
+        return {"error": "No exercise log found"}, 401
+    db.session.delete(log)
+    db.session.commit()
+    return{"message" : "Exercise log deletion successful"}, 200
 
 #######################################################################
 
