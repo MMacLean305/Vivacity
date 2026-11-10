@@ -233,15 +233,19 @@ def get_exercise_logs():
     for l in log:
         res.append({"id" : l.id, "session_id" : l.session_id, "exercise_id" : l.exercise_id, "sets" : l.sets, "reps" : l.reps, "weight" : log.weight})
     return res, 200
-'''
+
 @app.route("/api/exercise-logs/<int:id>", methods = ["GET"])
- def get_exercise_log(id):
+def get_exercise_log(id):
     user = get_current_user()
     if user is None:
         return {"error": "Authentication error"}, 401
-    res = {}
+
+    log = (ExerciseLog.query.join(SessionLog, ExerciseLog.session_id == SessionLog.id).filter(ExerciseLog.id == id, SessionLog.user_id == user.id).first())
+    if log is None:
+        return {"error" : "Exercise log not found"}, 404
+    res = {"id" : log.id, "session_id" : log.session_id, "exercise_id" : log.exercise_id, "sets" : log.sets, "reps" : log.reps, "weight" : log.weight}
     return res, 200
-'''
+
 @app.route("/api/exercise-logs/<int:id>", methods = ["PATCH"])
 def edit_exercise_log(id):
     changes = []
