@@ -1,5 +1,5 @@
 import firebase_admin
-
+import math
 from firebase_admin import auth, credentials
 from flask import Flask, render_template, request, session
 from database import db
@@ -252,18 +252,23 @@ def edit_exercise_log(id):
     if log is None:
         return {"error" : "Exercise log not found"}, 404
     if "sets" in req:
-        log.sets = req["sets"]
+        if type(req["sets"]) != int or req["sets"] < 0:
+            return {"error" : "Invalid sets entry"}, 400
         changes.append("sets")
     if "weight" in req:
-        log.weight = req["weight"]
+        if type(req["weight"]) not in (int, float) or not math.isfinite(req["weight"]) or req["weight"] < 0:
+            return {"error" : "Invalid weight entry"}, 400
         changes.append("weight")
     if "reps" in req:
-        log.reps = req["reps"]
+        if type(req["reps"]) != int or req["reps"] < 0:
+            return {"error" : "Invalid reps entry"}, 400
         changes.append("reps")
     if not changes:
         return {"error" : "No valid fields"}, 400
+    for field in changes:
+        setattr(log, field, req[field])
     db.session.commit()
-    return {"message" : "Exercise log edit successful", "log_id" : log.id, "updated fields" : changes}, 200
+    return {"message" : "Exercise log edit successful", "log_id" : log.id, "updated_fields" : changes}, 200
 
 #@app.route("/api/exercise-logs/<int:id>", methods = ["DELETE"])
 #def delete_exercise_log(id):
