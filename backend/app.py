@@ -270,8 +270,17 @@ def edit_exercise_log(id):
     db.session.commit()
     return {"message" : "Exercise log edit successful", "log_id" : log.id, "updated_fields" : changes}, 200
 
-#@app.route("/api/exercise-logs/<int:id>", methods = ["DELETE"])
-#def delete_exercise_log(id):
+@app.route("/api/exercise-logs/<int:id>", methods = ["DELETE"])
+def delete_exercise_log(id):
+    user = get_current_user()
+    if user is None:
+        return {"error": "Authentication error"}, 401
+    log = (ExerciseLog.query.join(SessionLog, ExerciseLog.session_id == SessionLog.id).filter(ExerciseLog.id == id, SessionLog.user_id == user.id).first())
+    if log is None:
+        return {"error": "No exercise log found"}, 401
+    db.session.delete(log)
+    db.session.commit()
+    return{"message" : "Exercise log deletion successful"}, 200
 
 #######################################################################
 
