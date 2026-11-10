@@ -1,7 +1,7 @@
 import firebase_admin
 
 from firebase_admin import auth, credentials
-from flask import Flask, render_template, request, session
+from flask import Flask, redirect, render_template, request, session
 from database import db
 from models import Exercise, Food, User, SessionLog, ExerciseLog, FoodLog
 import requests
@@ -32,6 +32,13 @@ with app.app_context():
 FIREBASE_API_KEY = os.getenv('FIREBASE_API_KEY')
 USDA_API_KEY = os.getenv('USDA_API_KEY')
 USDA_BASE = "https://api.nal.usda.gov/fdc/v1"
+
+@app.route('/dashboard')
+def dashboard():
+    user = get_current_user()
+    if user is None:
+        return redirect('/login')
+    return render_template('dashboard.html')
 
 @app.route('/register', methods=['POST'])
 def register():
