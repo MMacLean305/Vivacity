@@ -334,7 +334,36 @@ def get_food_logs():
         food = db.session.get(Food, log.food_id)
         res.append({"id" : log.id, "food_id" : log.food_id, "food_name" : food.name, "calories" : food.calories, "protein" : food.protein, "fat" : food.fats, "carbs" : food.carbs, "servings" : log.servings})
     return res, 200
+
+@app.route('/api/food-logs', methods=['POST'])
+def make_food_log():
+    user = get_current_user()
+    if user is None:
+        return {"error" : "Authentication Error"}, 401
+
+    data = request.get_json()
+    if not isinstance(data, dict):
+        return {"error" : "Invalid request data"}, 400
+
+    servings = data.get("servings")
+    if type(servings) not in (int, float) or servings <= 0 or not math.isfinite(servings):
+        return {"error" : "Invalid servings"}, 400
     
+    food = get_food(data.get("fdc_id"))
+    if food is None:
+        return {"error" : "Invalid food"}, 400
+
+    day = date.today()
+    try:
+        day = date.fromisoformat(data.get("date")) if data.get("date") else day
+    except (ValueError, TypeError):
+        return {"error" : "Invalid date"}, 400
+
+
+    new_entry = FoodLog(user_id = user.id, food_id = food.id, servings = servings, date = day)
+    db.session.add(new_entry)
+    db.session.commit()
+    return {"id" : new_entry.id, "food_id" : food.id, "food_name" : food.name, "calories" : food.calories, "protein" : food.protein, "fat" : food.fats, "carbs" : food.carbs, "servings" : servings}, 201
 
 
 
