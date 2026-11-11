@@ -306,7 +306,7 @@ def get_current_user():
     return User.query.filter_by(firebase_uid = fid).first()
 
 def get_food(fdc_id):
-    food = Food.query.filter_by(fdc_id = fdc_id).first()
+    food = Food.query.filter_by(fdcId = fdc_id).first()
     if food:
         return food
     try:
@@ -316,8 +316,28 @@ def get_food(fdc_id):
         return None
     if response.status_code != 200:
         return None
+    
     data = response.json()
-    food = Food(fdc_id = food_id, name = data['description'], calories = data['calories'])
+    calories = 0
+    fats = 0
+    protein = 0
+    carbs = 0
+
+    for nutrient in data.get("foodNutrients", []):
+        nutrient_id = nutrient.get("nutrient", {}).get("number")
+        amount = nutrient.get("amount")
+        if amount is None:
+            continue
+        if nutrient_id == "208":
+            calories = amount
+        elif nutrient_id == "204":
+            fats = amount
+        elif nutrient_id == "203":
+            protein = amount
+        elif nutrient_id == "205":
+            carbs = amount
+
+    food = Food(fdcId = fdc_id, name = data.get("description", ""), calories = calories, fats = fats, protein = protein, carbs = carbs)
     db.session.add(food)
     db.session.commit()
     return food
