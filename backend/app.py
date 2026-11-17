@@ -306,7 +306,7 @@ def get_current_user():
     return User.query.filter_by(firebase_uid = fid).first()
 
 def get_food(fdc_id):
-    food = Food.query.filter_by(fdc_id = fdc_id).first()
+    food = Food.query.filter_by(fdcId = fdc_id).first()
     if food:
         return food
     try:
@@ -316,11 +316,75 @@ def get_food(fdc_id):
         return None
     if response.status_code != 200:
         return None
+    
     data = response.json()
-    food = Food(fdc_id = food_id, name = data['description'], calories = data['calories'])
+    calories = 0
+    fats = 0
+    protein = 0
+    carbs = 0
+
+    for nutrient in data.get("foodNutrients", []):
+        nutrient_id = nutrient.get("nutrient", {}).get("number")
+        amount = nutrient.get("amount")
+        if amount is None:
+            continue
+        if nutrient_id == "208":
+            calories = amount
+        elif nutrient_id == "204":
+            fats = amount
+        elif nutrient_id == "203":
+            protein = amount
+        elif nutrient_id == "205":
+            carbs = amount
+
+    food = Food(fdcId = fdc_id, name = data.get("description", ""), calories = calories, fats = fats, protein = protein, carbs = carbs)
     db.session.add(food)
     db.session.commit()
     return food
+
+@app.route('/api/food-logs', methods=['GET'])
+def get_food_logs():
+    user = get_current_user()
+    if user is None:
+        return {"error" : "Authentication Error"}, 401
+
+    logs = FoodLog.query.filter_by(user_id = user.id).all()
+    res = []
+    for log in logs:
+        food = db.session.get(Food, log.food_id)
+        res.append({"id" : log.id, "food_id" : log.food_id, "food_name" : food.name, "calories" : food.calories, "protein" : food.protein, "fat" : food.fats, "carbs" : food.carbs, "servings" : log.servings})
+    return res, 200
+
+@app.route('/api/food-logs', methods=['POST'])
+def make_food_log():
+    user = get_current_user()
+    if user is None:
+        return {"error" : "Authentication Error"}, 401
+
+    data = request.get_json()
+    if not isinstance(data, dict):
+        return {"error" : "Invalid request data"}, 400
+
+    servings = data.get("servings")
+    if type(servings) not in (int, float) or servings <= 0 or not math.isfinite(servings):
+        return {"error" : "Invalid servings"}, 400
+    
+    food = get_food(data.get("fdc_id"))
+    if food is None:
+        return {"error" : "Invalid food"}, 400
+
+    day = date.today()
+    try:
+        day = date.fromisoformat(data.get("date")) if data.get("date") else day
+    except (ValueError, TypeError):
+        return {"error" : "Invalid date"}, 400
+
+
+    new_entry = FoodLog(user_id = user.id, food_id = food.id, servings = servings, date = day)
+    db.session.add(new_entry)
+    db.session.commit()
+    return {"id" : new_entry.id, "food_id" : food.id, "food_name" : food.name, "calories" : food.calories, "protein" : food.protein, "fat" : food.fats, "carbs" : food.carbs, "servings" : servings}, 201
+
 
 
 
