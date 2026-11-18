@@ -356,7 +356,7 @@ def get_food_logs():
     res = []
     for log in logs:
         food = db.session.get(Food, log.food_id)
-        res.append({"id" : log.id, "food_id" : log.food_id, "food_name" : food.name, "calories" : food.calories, "protein" : food.protein, "fat" : food.fats, "carbs" : food.carbs, "servings" : log.servings})
+        res.append({"id" : log.id, "food_id" : log.food_id, "food_name" : food.name, "calories" : food.calories, "protein" : food.protein, "fat" : food.fats, "carbs" : food.carbs, "servings" : log.quantity})
     return res, 200
 
 @app.route('/api/food-logs', methods=['POST'])
@@ -384,7 +384,7 @@ def make_food_log():
         return {"error" : "Invalid date"}, 400
 
 
-    new_entry = FoodLog(user_id = user.id, food_id = food.id, servings = servings, date = day)
+    new_entry = FoodLog(user_id = user.id, food_id = food.id, quantity = servings, date = day)
     db.session.add(new_entry)
     db.session.commit()
 
