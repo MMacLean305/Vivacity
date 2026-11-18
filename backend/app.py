@@ -436,7 +436,7 @@ def search_foods():
         res.append({"fdc_id" : food.get("fdcId"), "name" : food.get("description"), "calories" : cals})
     return res, 200   
     
-@app.route('/api/food-logs/', methods=['PATCH']):
+@app.route('/api/food-logs/', methods=['PATCH'])
 def edit_log():
     user = get_current_user()
     if user is None:
