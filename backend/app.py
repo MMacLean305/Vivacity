@@ -436,7 +436,30 @@ def search_foods():
         res.append({"fdc_id" : food.get("fdcId"), "name" : food.get("description"), "calories" : cals})
     return res, 200   
     
-    
+@app.route('/api/food-logs/', methods=['PATCH']):
+def edit_log():
+    user = get_current_user()
+    if user is None:
+        return {"error" : "Authentication Error"}, 401
+
+    data = request.get_json()
+    if not isinstance(data, dict):
+        return {"error" : "Invalid update"}, 400
+
+    log_id = data.get("id")
+    log = db.session.get(FoodLog, log_id)
+    if log is None or log.user_id != user.id:
+        return {"error": "Invalid query"}, 404
+
+    servings = data.get("servings")
+    if type(servings) not in (int, float) or servings <= 0 or not math.isfinite(servings):
+        return {"error" : "Invalid servings"}, 400
+
+    log.quantity = servings
+    db.session.commit()
+
+    food = db.session.get(Food, log.food_id)
+    return {"id" : log.id, "food_id" : food.id, "food_name" : food.name, "calories" : food.calories, "protein" : food.protein, "fat" : food.fats, "carbs" : food.carbs, "servings" : servings}, 200
 
     
 
