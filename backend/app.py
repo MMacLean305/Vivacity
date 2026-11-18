@@ -144,10 +144,12 @@ def get_sessions():
     user = get_current_user()
     if user is None:
         return {"error": "Authentication error"}, 401
-    sessions = SessionLog.query.filter_by(user_id = user.id).all()
+    sessions = SessionLog.query.filter_by(user_id = user.id).order_by(SessionLog.date.desc()).all()
     result = []
     for s in sessions:
-        result.append({"id" : s.id, "date": s.date.isofortmat()})
+        count = ExerciseLog.query.filter_by(session_id = s.id).count()
+        result.append({"id" : s.id, "date": s.date.isoformat(), "exercise_count": count})
+
     return result, 200
 
 @app.route("/api/sessions/<int:id>", methods = ["GET"])
@@ -155,11 +157,11 @@ def get_session(id):
     user = get_current_user()
     if user is None:
         return {"error": "Authentication error"}, 401
-    s = SessionLog.query.filter_by(id = id, user_id = user.id)
+    s = SessionLog.query.filter_by(id = id, user_id = user.id).first()
     if s is None:
         return {"error": "Session not found"}, 404
     log = ExerciseLog.query.filter_by(session_id = s.id).all()
-    result = { 'session_id': s.id, 'date': s.date.isoformat(),'exercises': [{'id': log.id, 'exercise_id': log.exercise_id, 'sets': log.sets, 'reps': log.reps, 'weight': log.weight} for l in log]}
+    result = { 'session_id': s.id, 'date': s.date.isoformat(),'exercises': [{'id': l.id, 'exercise_id': l.exercise_id, 'sets': l.sets, 'reps': l.reps, 'weight': l.weight, 'name': db.session.get(Exercise, l.exercise_id).name} for l in log]}
     return result
 
 @app.route("/api/sessions/<int:id>", methods = ["DELETE"])
@@ -176,7 +178,7 @@ def delete_session(id):
     return {'message' : "Session delete success"}, 200
 
 @app.route("/api/sessions", methods = ["DELETE"])
-def delete_session():
+def delete_sessions():
     user = get_current_user()
     if user is None:
         return {"error": "Authentication error"}, 401
@@ -238,7 +240,7 @@ def get_exercise_logs():
     log = (ExerciseLog.query.join(SessionLog, ExerciseLog.session_id == SessionLog.id).filter(SessionLog.user_id == user.id).all())
     res = []
     for l in log:
-        res.append({"id" : l.id, "session_id" : l.session_id, "exercise_id" : l.exercise_id, "sets" : l.sets, "reps" : l.reps, "weight" : log.weight})
+        res.append({"id" : l.id, "session_id" : l.session_id, "exercise_id" : l.exercise_id, "sets" : l.sets, "reps" : l.reps, "weight" : l.weight})
     return res, 200
 
 @app.route("/api/exercise-logs/<int:id>", methods = ["GET"])
@@ -348,11 +350,13 @@ def get_food_logs():
     if user is None:
         return {"error" : "Authentication Error"}, 401
 
-    logs = FoodLog.query.filter_by(user_id = user.id).all()
+    day = date.fromisoformat(request.args.get("date")) if request.args.get("date") else date.today()
+    logs = FoodLog.query.filter_by(user_id = user.id, date = day).all()
+
     res = []
     for log in logs:
         food = db.session.get(Food, log.food_id)
-        res.append({"id" : log.id, "food_id" : log.food_id, "food_name" : food.name, "calories" : food.calories, "protein" : food.protein, "fat" : food.fats, "carbs" : food.carbs, "servings" : log.servings})
+        res.append({"id" : log.id, "food_id" : log.food_id, "food_name" : food.name, "calories" : food.calories, "protein" : food.protein, "fat" : food.fats, "carbs" : food.carbs, "servings" : log.quantity})
     return res, 200
 
 @app.route('/api/food-logs', methods=['POST'])
@@ -380,12 +384,84 @@ def make_food_log():
         return {"error" : "Invalid date"}, 400
 
 
-    new_entry = FoodLog(user_id = user.id, food_id = food.id, servings = servings, date = day)
+    new_entry = FoodLog(user_id = user.id, food_id = food.id, quantity = servings, date = day)
     db.session.add(new_entry)
     db.session.commit()
+
     return {"id" : new_entry.id, "food_id" : food.id, "food_name" : food.name, "calories" : food.calories, "protein" : food.protein, "fat" : food.fats, "carbs" : food.carbs, "servings" : servings}, 201
 
+@app.route('/api/food-logs', methods=['DELETE'])
+def delete_food_entry():
+    user = get_current_user()
+    if user is None:
+        return {"error" : "Authentication Error"}, 401
 
+    data = request.get_json()
+    if not isinstance(data,dict):
+        return {"error" : "Invalid data"}, 400
+
+    log_id = data.get("id")
+    log = db.session.get(FoodLog, log_id)
+    if log is None or log.user_id != user.id:
+        return {"error": "Invalid query"}, 404
+
+    db.session.delete(log)
+    db.session.commit()
+    return {"message" : "Food entry deleted"}, 200
+
+@app.route('/api/foods', methods=['GET'])
+def search_foods():
+    user = get_current_user()
+    if user is None:
+        return {"error" : "Authentication Error"}, 401
+
+    query = request.args.get("search", "")
+    if not query:
+        return [], 200
+    
+    try:
+        response = requests.get(f"{USDA_BASE}/foods/search", params={"query": query, "api_key": USDA_API_KEY}, timeout=10)
+    except requests.RequestException:
+        return {"error":"Food not Found"}, 502
+    if response.status_code != 200:
+        return {"error":"Food not Found"}, 502
+
+    res =[]
+    for food in response.json().get("foods", []):
+        cals = 0
+        for nutrient in food.get("foodNutrients", []):
+            if nutrient.get("nutrientNumber") == "208":
+                cals = nutrient.get("value", 0)
+                break
+        res.append({"fdc_id" : food.get("fdcId"), "name" : food.get("description"), "calories" : cals})
+    return res, 200   
+    
+@app.route('/api/food-logs/', methods=['PATCH'])
+def edit_log():
+    user = get_current_user()
+    if user is None:
+        return {"error" : "Authentication Error"}, 401
+
+    data = request.get_json()
+    if not isinstance(data, dict):
+        return {"error" : "Invalid update"}, 400
+
+    log_id = data.get("id")
+    log = db.session.get(FoodLog, log_id)
+    if log is None or log.user_id != user.id:
+        return {"error": "Invalid query"}, 404
+
+    servings = data.get("servings")
+    if type(servings) not in (int, float) or servings <= 0 or not math.isfinite(servings):
+        return {"error" : "Invalid servings"}, 400
+
+    log.quantity = servings
+    db.session.commit()
+
+    food = db.session.get(Food, log.food_id)
+    return {"id" : log.id, "food_id" : food.id, "food_name" : food.name, "calories" : food.calories, "protein" : food.protein, "fat" : food.fats, "carbs" : food.carbs, "servings" : servings}, 200
+
+    
 
 
 if __name__ == '__main__':
