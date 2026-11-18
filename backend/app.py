@@ -144,10 +144,12 @@ def get_sessions():
     user = get_current_user()
     if user is None:
         return {"error": "Authentication error"}, 401
-    sessions = SessionLog.query.filter_by(user_id = user.id).all()
+    sessions = SessionLog.query.filter_by(user_id = user.id).order_by(SessionLog.date.desc()).all()
     result = []
     for s in sessions:
-        result.append({"id" : s.id, "date": s.date.isoformat()})
+        count = ExerciseLog.query.filter_by(session_id = s.id).count()
+        result.append({"id" : s.id, "date": s.date.isoformat(), "exercise_count": count})
+
     return result, 200
 
 @app.route("/api/sessions/<int:id>", methods = ["GET"])
@@ -350,7 +352,7 @@ def get_food_logs():
 
     day = date.fromisoformat(request.args.get("date")) if request.args.get("date") else date.today()
     logs = FoodLog.query.filter_by(user_id = user.id, date = day).all()
-    
+
     res = []
     for log in logs:
         food = db.session.get(Food, log.food_id)
