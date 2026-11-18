@@ -176,7 +176,7 @@ def delete_session(id):
     return {'message' : "Session delete success"}, 200
 
 @app.route("/api/sessions", methods = ["DELETE"])
-def delete_session():
+def delete_sessions():
     user = get_current_user()
     if user is None:
         return {"error": "Authentication error"}, 401
@@ -383,9 +383,58 @@ def make_food_log():
     new_entry = FoodLog(user_id = user.id, food_id = food.id, servings = servings, date = day)
     db.session.add(new_entry)
     db.session.commit()
+
     return {"id" : new_entry.id, "food_id" : food.id, "food_name" : food.name, "calories" : food.calories, "protein" : food.protein, "fat" : food.fats, "carbs" : food.carbs, "servings" : servings}, 201
 
+@app.route('/api/food-logs', methods=['DELETE'])
+def delete_food_entry():
+    user = get_current_user()
+    if user is None:
+        return {"error" : "Authentication Error"}, 401
 
+    data = request.get_json()
+    if not isinstance(data,dict):
+        return {"error" : "Invalid data"}, 400
+
+    log_id = data.get("id")
+    log = db.session.get(FoodLog, log_id)
+    if log is None or log.user_id != user.id:
+        return {"error": "Invalid query"}, 404
+
+    db.session.delete(log)
+    db.session.commit()
+    return {"message" : "Food entry deleted"}, 200
+
+@app.route('/api/foods', methods=['GET'])
+def search_foods():
+    user = get_current_user()
+    if user is None:
+        return {"error" : "Authentication Error"}, 401
+
+    query = request.args.get("search", "")
+    if not query:
+        return [], 200
+    
+    try:
+        response = requests.get(f"{USDA_BASE}/foods/search", params={"query": query, "api_key": USDA_API_KEY}, timeout=10)
+    except requests.RequestException:
+        return {"error":"Food not Found"}, 502
+    if response.status_code != 200:
+        return {"error":"Food not Found"}, 502
+
+    res =[]
+    for food in response.json().get("foods", []):
+        cals = 0
+        for nutrient in food.get("foodNutrients", []):
+            if nutrient.get("nutrientNumber") == "208":
+                cals = nutrient.get("value", 0)
+                break
+        res.append({"fdc_id" : food.get("fdcId"), "name" : food.get("description"), "calories" : cals})
+    return res, 200   
+    
+    
+
+    
 
 
 if __name__ == '__main__':
