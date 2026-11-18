@@ -147,7 +147,7 @@ def get_sessions():
     sessions = SessionLog.query.filter_by(user_id = user.id).all()
     result = []
     for s in sessions:
-        result.append({"id" : s.id, "date": s.date.isofortmat()})
+        result.append({"id" : s.id, "date": s.date.isoformat()})
     return result, 200
 
 @app.route("/api/sessions/<int:id>", methods = ["GET"])
@@ -155,11 +155,11 @@ def get_session(id):
     user = get_current_user()
     if user is None:
         return {"error": "Authentication error"}, 401
-    s = SessionLog.query.filter_by(id = id, user_id = user.id)
+    s = SessionLog.query.filter_by(id = id, user_id = user.id).first()
     if s is None:
         return {"error": "Session not found"}, 404
     log = ExerciseLog.query.filter_by(session_id = s.id).all()
-    result = { 'session_id': s.id, 'date': s.date.isoformat(),'exercises': [{'id': log.id, 'exercise_id': log.exercise_id, 'sets': log.sets, 'reps': log.reps, 'weight': log.weight} for l in log]}
+    result = { 'session_id': s.id, 'date': s.date.isoformat(),'exercises': [{'id': l.id, 'exercise_id': l.exercise_id, 'sets': l.sets, 'reps': l.reps, 'weight': l.weight, 'name': db.session.get(Exercise, l.exercise_id).name} for l in log]}
     return result
 
 @app.route("/api/sessions/<int:id>", methods = ["DELETE"])
@@ -238,7 +238,7 @@ def get_exercise_logs():
     log = (ExerciseLog.query.join(SessionLog, ExerciseLog.session_id == SessionLog.id).filter(SessionLog.user_id == user.id).all())
     res = []
     for l in log:
-        res.append({"id" : l.id, "session_id" : l.session_id, "exercise_id" : l.exercise_id, "sets" : l.sets, "reps" : l.reps, "weight" : log.weight})
+        res.append({"id" : l.id, "session_id" : l.session_id, "exercise_id" : l.exercise_id, "sets" : l.sets, "reps" : l.reps, "weight" : l.weight})
     return res, 200
 
 @app.route("/api/exercise-logs/<int:id>", methods = ["GET"])
@@ -348,7 +348,9 @@ def get_food_logs():
     if user is None:
         return {"error" : "Authentication Error"}, 401
 
-    logs = FoodLog.query.filter_by(user_id = user.id).all()
+    day = date.fromisoformat(request.args.get("date")) if request.args.get("date") else date.today()
+    logs = FoodLog.query.filter_by(user_id = user.id, date = day).all()
+    
     res = []
     for log in logs:
         food = db.session.get(Food, log.food_id)
