@@ -37,7 +37,7 @@ form.addEventListener('submit', async (e) => {
 
     const res  = await response.json()
     if(response.ok){
-        window.location.href = email_input ? '/login' : '/'
+        window.location.href = email_input ? '/login' : '/dashboard'
     }else{
         error_message.innerText = res.error
     }
