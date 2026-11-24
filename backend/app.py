@@ -89,6 +89,7 @@ def login():
             session["user_id"] = response_data["localId"]
             return {'message': 'Login successful'}, 200
         else:
+            print('Login Error: ', response_data)
             return {'error': 'Login failed'}, 401
 
     except:
