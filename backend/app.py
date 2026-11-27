@@ -462,7 +462,29 @@ def edit_log():
     food = db.session.get(Food, log.food_id)
     return {"id" : log.id, "food_id" : food.id, "food_name" : food.name, "calories" : food.calories, "protein" : food.protein, "fat" : food.fats, "carbs" : food.carbs, "servings" : servings}, 200
 
-    
+@app.route('/api/admin/delete', methods=['DELETE'])
+def delete_delete_user():
+    user = get_current_user()
+    if user is None:
+        return {"error" : "Authentication Error"}, 401
+    if user.role != "admin":
+        return {"error" : "Authorization Error"}, 403
+
+    data = request.get_json()
+    if not isinstance(data, dict):
+        return {"error" : "Invalid data"}, 400
+
+    user_id = data.get("id")
+    if not isinstance(user_id, int):
+        return {"error" : "Invalid user ID"}, 400
+
+    db_user = db.session.get(User, user_id)
+    if db_user is None:
+        return {"error": "User not found"}, 404
+
+    db.session.delete(db_user)
+    db.session.commit()
+    return {"message" : "User deleted"}, 200
 
 
 if __name__ == '__main__':
